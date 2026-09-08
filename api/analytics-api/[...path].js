@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // CORS: GitHub Pages will call this Vercel Function from the browser.
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
@@ -9,12 +8,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const rawPath = req.query?.path;
-    const segments = Array.isArray(rawPath) ? rawPath : (rawPath ? [rawPath] : []);
-    const apiPath = segments.map(encodeURIComponent).join('/');
+    // En Vercel, el parámetro de una ruta catch-all puede no llegar
+    // como req.query.path según el runtime. Por eso obtenemos el path
+    // directamente desde req.url.
+    const incoming = new URL(req.url || '/', 'https://miruta-analytics.vercel.app');
+    const prefix = '/api/analytics-api';
+    let apiPath = incoming.pathname.startsWith(prefix)
+      ? incoming.pathname.slice(prefix.length)
+      : '';
 
-    const incoming = new URL(req.url, 'http://localhost');
-    const target = `https://analytics.trujillo.trufi.dev/analytics-api/${apiPath}${incoming.search}`;
+    if (!apiPath || apiPath === '/') {
+      apiPath = '/Stats';
+    }
+
+    const target = `https://analytics.trujillo.trufi.dev/analytics-api${apiPath}${incoming.search}`;
+    console.log('Analytics proxy:', req.method, incoming.pathname, '->', target);
 
     const headers = {};
     if (req.headers.accept) headers.accept = req.headers.accept;
