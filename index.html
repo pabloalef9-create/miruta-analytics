@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MiRuta Analytics | Dashboard de Movilidad</title>
+<style>
+:root{
+  --navy:#101a2d; --navy2:#17233a; --blue:#2684ff; --blue2:#4ba3ff;
+  --green:#18b85b; --green2:#20d36b; --orange:#ff9f43; --red:#ef5b6b;
+  --cyan:#28c7d9; --bg:#eef2f7; --card:#fff; --line:#dce3ec;
+  --ink:#172238; --muted:#77849a; --shadow:0 2px 8px rgba(16,26,45,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Segoe UI,Arial,sans-serif}
+.app{display:flex;min-height:100vh}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:235px;background:var(--navy);color:#dce6f4;padding:14px 12px;overflow:auto}
+.brand{height:72px;border:1px solid #26344d;border-radius:8px;background:#0d1627;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;margin-bottom:12px}
+.brand b{font-size:12px;letter-spacing:.2px;color:#fff}.brand small{display:block;font-size:9px;color:#aab9cf;margin-top:5px}
+.navtitle{font-size:10px;color:#8291a8;text-transform:uppercase;letter-spacing:1px;padding:9px 8px 5px}
+.nav button{display:block;width:100%;border:0;background:transparent;color:#cbd6e5;text-align:left;border-radius:6px;padding:10px 9px;margin:2px 0;font:600 12px Segoe UI;cursor:pointer}
+.nav button:hover,.nav button.active{background:#1c2c47;color:#fff}
+.nav button span{display:inline-block;width:23px;color:#8fb7ef}
+.filters{margin-top:8px;border-top:1px solid #26344d;padding-top:9px}
+.filter label{display:block;font-size:9px;color:#8998ad;margin:8px 4px 3px;text-transform:uppercase}
+.filter select{width:100%;background:#0c1627;color:#dfe8f4;border:1px solid #33435d;border-radius:4px;padding:6px;font-size:10px}
+.sidefoot{margin-top:20px;text-align:center;border-top:1px solid #26344d;padding-top:15px;color:#91a1b8;font-size:10px;line-height:1.5}
+.sidefoot b{display:block;color:#fff;letter-spacing:4px;font-size:11px;margin-bottom:4px}
+main{margin-left:235px;width:calc(100% - 235px);padding:15px 18px 35px}
+.header{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:12px}
+.header h1{margin:0;font-size:20px}.header p{margin:3px 0 0;color:var(--muted);font-size:11px}
+.controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.controls input{border:1px solid var(--line);background:#fff;border-radius:5px;padding:7px 8px;font-size:11px}
+.btn{border:0;background:var(--blue);color:#fff;border-radius:5px;padding:8px 11px;font:700 11px Segoe UI;cursor:pointer}.btn:hover{background:#0e6fe7}.btn:disabled{opacity:.55}
+.status{font-size:10px;color:var(--muted)}.status.ok{color:#09854b}.status.err{color:#d6404f}
+.live{background:#e8f9ef;color:#087b48;padding:5px 7px;border-radius:10px;font-size:9px;font-weight:800}.live i{display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;margin-right:4px}
+.grid{display:grid;gap:9px}.kpis{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1.25fr 1fr 1fr}
+.card{background:var(--card);border:1px solid var(--line);border-radius:7px;box-shadow:var(--shadow);padding:12px}
+.kpi{min-height:84px;display:flex;align-items:center;gap:10px}.kico{width:43px;height:43px;border-radius:7px;background:#e9f2ff;display:grid;place-items:center;font-size:20px}.kpi h4{margin:0 0 5px;font-size:10px;color:#44526a}.kpi strong{font-size:21px}.kpi small{display:block;color:var(--muted);font-size:9px;margin-top:2px}
+.section{margin-top:9px}.sectiontitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.sectiontitle h2{font-size:13px;margin:0}.sectiontitle small{color:var(--muted);font-size:9px}
+.metrics{grid-template-columns:repeat(4,1fr)}.metric{padding:11px;border-left:3px solid var(--blue);background:#f8fafc;border-radius:5px}.metric:nth-child(2){border-color:var(--green)}.metric:nth-child(3){border-color:var(--orange)}.metric:nth-child(4){border-color:var(--red)}.metric span{font-size:9px;color:var(--muted)}.metric b{display:block;font-size:18px;margin-top:4px}
+.chartbox{height:270px;position:relative}.chartbox svg{width:100%;height:100%;display:block}.axis{fill:#7d899b;font-size:9px}.gridline{stroke:#e5eaf0;stroke-width:1}.line{fill:none;stroke:var(--blue);stroke-width:3}.dot{fill:#fff;stroke:var(--blue);stroke-width:2}.bar{fill:var(--blue)}.bar.green{fill:var(--green)}.bar.orange{fill:var(--orange)}.bar.red{fill:var(--red)}
+.donut{display:flex;align-items:center;justify-content:center;gap:18px;height:235px}.donut svg{width:190px;height:190px}.legend{font-size:10px;display:grid;gap:9px}.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}.center{font-size:10px;fill:#69778b;text-anchor:middle}
+.rank{display:grid;gap:8px}.rankrow{display:grid;grid-template-columns:150px 1fr 55px;gap:8px;align-items:center;font-size:10px}.rankbar{height:9px;background:#edf1f6;border-radius:5px;overflow:hidden}.rankbar i{display:block;height:100%;background:var(--blue);border-radius:5px}.rankval{text-align:right;font-weight:800}
+.tablewrap{overflow:auto;max-height:330px}.table{border-collapse:collapse;width:100%;font-size:10px}.table th,.table td{padding:7px;border-bottom:1px solid #edf0f4;text-align:left}.table th{background:#f7f9fc;color:#4d5b70;position:sticky;top:0}.table tr:hover td{background:#f4f8ff}.pill{padding:3px 6px;border-radius:8px;background:#e5f8ed;color:#087b48;font-weight:800}
+.options{display:grid;gap:8px}.option{border:1px solid #e2e8f0;border-radius:6px;padding:10px}.optionhead{display:flex;justify-content:space-between;gap:12px}.optiontitle{font-weight:800;font-size:11px}.optionmeta{font-size:9px;color:#69778b;margin-top:4px}.leg{display:inline-block;background:#f0f4f9;border-radius:4px;padding:5px 6px;margin:6px 4px 0 0;font-size:9px}.leg.bus{background:#e9f3ff;color:#0c64d7}.note{font-size:9px;color:#56647a;background:#f4f8ff;border-left:3px solid var(--blue);padding:8px;margin-top:8px}
+.matrix{overflow:auto}.matrix table{border-collapse:collapse;width:100%;font-size:10px}.matrix th,.matrix td{border:1px solid #edf0f4;padding:8px;text-align:center}.matrix th{background:#f6f8fb}.matrix th:first-child{text-align:left}.heat{font-weight:800;color:#173b6d}
+.detail table{width:100%;border-collapse:collapse;font-size:10px}.detail td{padding:7px;border-bottom:1px solid #edf0f4}.detail td:first-child{color:#718096;width:42%}.empty{padding:14px;color:#7b8798;font-size:10px}
+@media(max-width:1000px){.sidebar{width:205px}main{margin-left:205px;width:calc(100% - 205px)}.kpis,.metrics{grid-template-columns:repeat(2,1fr)}.g2,.g3{grid-template-columns:1fr}}
+@media(max-width:680px){.sidebar{position:relative;width:100%;height:auto}.app{display:block}main{margin:0;width:100%}.header{display:block}.controls{margin-top:9px}.kpis,.metrics{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand"><div><b>DASHBOARD DE MOVILIDAD Y ANALÍTICA</b><small>MiRuta · Trujillo</small></div></div>
+ <nav class="nav">
+  <button class="active" onclick="go('top')"><span>⌂</span>Dashboard</button>
+  <button onclick="go('times')"><span>◷</span>Análisis de tiempos</button>
+  <button onclick="go('routes')"><span>↝</span>Rutas y empresas</button>
+  <button onclick="go('otp')"><span>▤</span>Opciones OTP</button>
+  <button onclick="go('od')"><span>▦</span>Matriz OD</button>
+  <button onclick="go('logs')"><span>▣</span>Logs</button>
+  <button onclick="go('devices')"><span>▥</span>Dispositivos</button>
+  <button onclick="window.open(API+'/swagger/index.html','_blank')"><span>ⓘ</span>Swagger API</button>
+ </nav>
+ <div class="filters">
+  <div class="navtitle">Filtros</div>
+  <div class="filter"><label>Año</label><select id="year"><option>Todos</option></select></div>
+  <div class="filter"><label>Origen</label><select id="origin"><option value="">Todos</option></select></div>
+  <div class="filter"><label>Destino</label><select id="destination"><option value="">Todos</option></select></div>
+  <div class="filter"><label>Empresa</label><select id="agency"><option value="">Todas</option></select></div>
+  <div class="filter"><label>Ruta</label><select id="route"><option value="">Todas</option></select></div>
+ </div>
+ <div class="sidefoot"><b>TRUJILLO</b>Movilidad inteligente<br>para una mejor ciudad</div>
+</aside>
+
+<main id="top">
+ <div class="header">
+  <div><h1>MiRuta Analytics</h1><p>Dashboard de búsquedas, oferta de transporte e itinerarios devueltos por OpenTripPlanner</p></div>
+  <div class="controls"><span id="period"></span><input type="date" id="from"><input type="date" id="to"><button class="btn" id="apply">Aplicar</button><button class="btn" id="refresh">↻</button></div>
+ </div>
+ <div class="controls" style="margin-bottom:9px"><span id="status" class="status">Conectando…</span><span class="live"><i></i>AUTO 60s</span><span id="last" class="status"></span></div>
+
+ <section class="grid kpis">
+  <div class="card kpi"><div class="kico">➤</div><div><h4>BÚSQUEDAS</h4><strong id="total">—</strong><small>solicitudes en el periodo</small></div></div>
+  <div class="card kpi"><div class="kico">▣</div><div><h4>DISPOSITIVOS</h4><strong id="devices">—</strong><small>dispositivos únicos</small></div></div>
+  <div class="card kpi"><div class="kico">▰</div><div><h4>RUTAS OFRECIDAS</h4><strong id="routeCount">—</strong><small>rutas identificadas en OTP</small></div></div>
+  <div class="card kpi"><div class="kico">◇</div><div><h4>EMPRESAS OFRECIDAS</h4><strong id="agencyCount">—</strong><small>empresas identificadas en OTP</small></div></div>
+ </section>
+
+ <section class="card section" id="times">
+  <div class="sectiontitle"><h2>Indicadores de tiempos de las rutas solicitadas</h2><small>Basados en itinerarios del responseBody</small></div>
+  <div class="grid metrics">
+   <div class="metric"><span>DURACIÓN PROMEDIO</span><b id="avgDuration">—</b></div>
+   <div class="metric"><span>CAMINATA PROMEDIO</span><b id="avgWalk">—</b></div>
+   <div class="metric"><span>ESPERA PROMEDIO</span><b id="avgWait">—</b></div>
+   <div class="metric"><span>HORA DE SALIDA MÁS SOLICITADA</span><b id="topDeparture">—</b><span id="topDepartureCount"></span></div>
+  </div>
+ </section>
+
+ <section class="grid g2 section">
+  <div class="card"><div class="sectiontitle"><h2>Duración de las alternativas OTP</h2><small>promedio por alternativa</small></div><div class="chartbox" id="durationChart"></div></div>
+  <div class="card"><div class="sectiontitle"><h2>Distribución de tiempos</h2><small>caminata · espera · resto del viaje</small></div><div class="chartbox" id="timeChart"></div></div>
+ </section>
+
+ <section class="grid g2 section" id="routes">
+  <div class="card"><div class="sectiontitle"><h2>Rutas más ofrecidas</h2><small>apariciones en alternativas OTP</small></div><div id="routesRank" class="rank"></div></div>
+  <div class="card"><div class="sectiontitle"><h2>Empresas más ofrecidas</h2><small>apariciones en alternativas OTP</small></div><div id="agencyRank" class="rank"></div></div>
+ </section>
+
+ <section class="grid g2 section">
+  <div class="card"><div class="sectiontitle"><h2>Paraderos más ofrecidos</h2><small>paraderos presentes en los itinerarios</small></div><div id="stopRank" class="rank"></div></div>
+  <div class="card"><div class="sectiontitle"><h2>Empresa → Ruta → Paradero</h2><small>relación de oferta de transporte</small></div>
+   <div class="tablewrap"><table class="table"><thead><tr><th>Empresa</th><th>Ruta</th><th>Paradero</th><th>Apariciones</th></tr></thead><tbody id="relationRows"></tbody></table></div>
+  </div>
+ </section>
+
+ <section class="card section" id="otp">
+  <div class="sectiontitle"><h2>Opciones de viaje ofrecidas por OTP</h2><small>detalle de cada alternativa y sus legs</small></div>
+  <div id="optionsBox" class="options"></div>
+  <div class="note"><b>Lectura correcta:</b> una empresa/ruta/paradero aquí significa que OTP la incluyó en una alternativa de planificación. No significa que el usuario haya realizado el viaje.</div>
+ </section>
+
+ <section class="card section" id="od">
+  <div class="sectiontitle"><h2>Matriz Origen → Destino</h2><small>solicitudes de planificación por distrito</small></div>
+  <div id="matrix" class="matrix"></div>
+ </section>
+
+ <section class="grid g2 section">
+  <div class="card" id="logs"><div class="sectiontitle"><h2>Logs de solicitudes</h2><small>registros utilizados en el análisis</small></div>
+   <div class="tablewrap"><table class="table"><thead><tr><th>Fecha/hora</th><th>Origen</th><th>Destino</th><th>Alt.</th><th>Status</th></tr></thead><tbody id="logrows"></tbody></table></div>
+  </div>
+  <div class="card"><div class="sectiontitle"><h2>Detalle del log</h2><small>selecciona una fila</small></div><div id="detail" class="detail empty">Selecciona un log.</div></div>
+ </section>
+
+ <section class="card section" id="devices">
+  <div class="sectiontitle"><h2>Cadena de información</h2><small>de la búsqueda al análisis</small></div>
+  <div class="grid metrics">
+   <div class="metric"><span>CLIENTE</span><b style="font-size:15px">MiRuta</b><span>Flutter / Dart</span></div>
+   <div class="metric"><span>PLANIFICADOR</span><b style="font-size:15px">OpenTripPlanner</b><span>GraphQL</span></div>
+   <div class="metric"><span>FUENTE</span><b style="font-size:15px">Analytics API</b><span>Logs + Stats</span></div>
+   <div class="metric"><span>ANÁLISIS</span><b style="font-size:15px">Dashboard</b><span>Demanda + oferta</span></div>
+  </div>
+ </section>
+</main>
+</div>
+
+<script>
+const API='/api/analytics-api';
+const DIST={'1968056':'Trujillo','1968006':'Huanchaco','1968014':'La Esperanza','1968000':'El Porvenir','1968001':'Florencia de Mora','1968062':'Victor Larco Herrera','1968015':'Laredo','1968022':'Moche','1968039':'Salaverry','1968051':'Simbal','1968035':'Poroto','1967993':'Chicama','1968061':'Viru'};
+let rows=[];
+const $=id=>document.getElementById(id), fmt=n=>Number(n||0).toLocaleString('es-PE');
+const name=id=>DIST[String(id)]||('Distrito '+id);
+const go=id=>$(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+function parse(x){try{return typeof x==='string'?JSON.parse(x):(x||{})}catch{return{}}}
+function headers(x){return parse(x)}
+function H(x,k){const h=headers(x);let v=h[k]??h[k.toLowerCase()]??h[k.toUpperCase()];return Array.isArray(v)?v[0]:(v??'')}
+function list(x){return Array.isArray(x)?x:(x?.data||x?.items||x?.results||[])}
+async function get(u){const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw Error(r.status);return r.json()}
+function extract(l){
+ const b=parse(l.body);
+ return {raw:l,id:l.id,date:l.receivedAt?new Date(l.receivedAt):null,oid:H(l.requestHeaders,'x-origin-district'),did:H(l.requestHeaders,'x-destination-district'),
+  device:l.deviceId||H(l.requestHeaders,'x-device-id'),status:l.statusCode,method:l.method,uri:l.uri,host:l.host,
+  alts:b.variables?.numItineraries??'—',requestedTime:b.variables?.time||'—'};
+}
+function its(l){const r=parse(l.raw?.responseBody);const d=r?.data||r;return Array.isArray(d?.plan?.itineraries)?d.plan.itineraries:[]}
+function analyze(a){
+ const z={routes:{},agencies:{},stops:{},relations:{},dur:[],walk:[],wait:[],dep:{},options:[],durationBuckets:{},timeTotals:{walk:0,wait:0,ride:0}};
+ a.forEach(l=>its(l).forEach((it,idx)=>{
+  const routes=new Set(),agencies=new Set(),stops=new Set(),legs=[];
+  (it.legs||[]).forEach(leg=>{
+   const r=leg.route||{},ag=r.agency||{},mode=(leg.mode||'').toUpperCase(),rn=r.shortName||r.longName||'',an=ag.name||'';
+   if(rn){routes.add(rn);z.routes[rn]=(z.routes[rn]||0)+1}
+   if(an){agencies.add(an);z.agencies[an]=(z.agencies[an]||0)+1}
+   [leg.from?.stop?.name,leg.to?.stop?.name].filter(Boolean).forEach(s=>{stops.add(s);z.stops[s]=(z.stops[s]||0)+1});
+   const sec=Number(leg.duration)||0;if(mode==='WALK')z.timeTotals.walk+=sec;else if(mode==='BUS'||mode==='TRANSIT')z.timeTotals.ride+=sec;
+   legs.push({mode,route:rn,agency:an,from:leg.from?.stop?.name||leg.from?.name||'',to:leg.to?.stop?.name||leg.to?.name||'',duration:sec});
+  });
+  const route=[...routes][0]||'Ruta no identificada', agency=[...agencies][0]||'Empresa no identificada';
+  stops.forEach(s=>{const k=agency+'|'+route+'|'+s;z.relations[k]=(z.relations[k]||0)+1});
+  const d=Number(it.duration)||0,w=Number(it.walkTime)||0,q=Number(it.waitingTime)||0;
+  if(d)z.dur.push(d);if(w)z.walk.push(w);if(q>=0)z.wait.push(q);z.timeTotals.wait+=q;
+  if(d){const bucket=Math.round(d/300)*5;z.durationBuckets[bucket]=(z.durationBuckets[bucket]||0)+1}
+  if(it.startTime){const dt=new Date(it.startTime);if(!isNaN(dt)){const h=String(dt.getUTCHours()).padStart(2,'0');z.dep[h]=(z.dep[h]||0)+1}}
+  z.options.push({index:idx+1,duration:d,walk:w,wait:q,routes:[...routes],agencies:[...agencies],stops:[...stops],legs,log:l});
+ }));
+ return z;
+}
+function avg(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:0}
+function mins(s){if(!s)return'0 min';const m=Math.round(s/60);return m>=60?Math.floor(m/60)+' h '+m%60+' min':m+' min'}
+function rank(id,obj){
+ const q=Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,8),max=q[0]?.[1]||1;
+ $(id).innerHTML=q.length?q.map(([n,v])=>`<div class="rankrow"><div>${n}</div><div class="rankbar"><i style="width:${v/max*100}%"></i></div><div class="rankval">${fmt(v)}</div></div>`).join(''):'<div class="empty">No hay datos de responseBody.</div>';
+}
+function renderCharts(z){
+ const q=Object.entries(z.durationBuckets).sort((a,b)=>Number(a[0])-Number(b[0])).slice(-12);
+ const W=620,H=250,p={l:45,r:15,t:15,b:35},cw=W-p.l-p.r,ch=H-p.t-p.b,max=Math.max(1,...q.map(x=>x[1]));
+ let s=`<svg viewBox="0 0 ${W} ${H}"><line class="gridline" x1="${p.l}" y1="${p.t}" x2="${W-p.r}" y2="${p.t}"/><line class="gridline" x1="${p.l}" y1="${p.t+ch/2}" x2="${W-p.r}" y2="${p.t+ch/2}"/><line class="gridline" x1="${p.l}" y1="${p.t+ch}" x2="${W-p.r}" y2="${p.t+ch}">`;
+ s+='</line><text class="axis" x="5" y="'+(p.t+5)+'">'+max+'</text><text class="axis" x="10" y="'+(p.t+ch+3)+'">0</text>';
+ q.forEach((x,i)=>{const bw=Math.max(12,cw/q.length-8),x0=p.l+i*cw/q.length+4,h=x[1]/max*ch,y=p.t+ch-h;s+=`<rect class="bar" x="${x0}" y="${y}" width="${bw}" height="${h}" rx="2"/><text class="axis" text-anchor="middle" x="${x0+bw/2}" y="${H-13}">${x[0]}m</text>`});s+='</svg>';$('durationChart').innerHTML=s;
+ const total=z.timeTotals.walk+z.timeTotals.wait+z.timeTotals.ride||1, parts=[['Caminata',z.timeTotals.walk,'var(--green)'],['Espera',z.timeTotals.wait,'var(--orange)'],['Transporte',z.timeTotals.ride,'var(--blue)']];
+ let x=40,y=25,w=540,h=34,svg=`<svg viewBox="0 0 620 180"><text class="axis" x="40" y="18">Distribución acumulada del tiempo de los legs</text>`;
+ let cur=x;parts.forEach(([n,v,c])=>{let ww=w*v/total;svg+=`<rect x="${cur}" y="${y}" width="${ww}" height="${h}" fill="${c}"/><text x="${cur+ww/2}" y="${y+22}" fill="#fff" font-size="10" text-anchor="middle">${n}</text>`;cur+=ww});
+ parts.forEach(([n,v],i)=>{svg+=`<circle cx="45" cy="${90+i*25}" r="5" fill="${['#18b85b','#ff9f43','#2684ff'][i]}"/><text class="axis" x="58" y="${94+i*25}">${n}: ${mins(v)} (${(v/total*100).toFixed(1)}%)</text>`});svg+='</svg>';$('timeChart').innerHTML=svg;
+}
+function renderRelations(z){
+ const q=Object.entries(z.relations).sort((a,b)=>b[1]-a[1]).slice(0,30);
+ $('relationRows').innerHTML=q.length?q.map(([k,v])=>{const [a,r,s]=k.split('|');return`<tr><td>${a}</td><td><b>${r}</b></td><td>${s}</td><td>${fmt(v)}</td></tr>`}).join(''):'<tr><td colspan="4">Sin datos.</td></tr>';
+}
+function renderOptions(z){
+ $('optionsBox').innerHTML=z.options.length?z.options.slice(0,15).map(o=>`<div class="option"><div class="optionhead"><div class="optiontitle">Alternativa ${o.index} · ${o.routes.length?o.routes.join(' / '):'sin ruta identificada'}</div><b>${mins(o.duration)}</b></div><div class="optionmeta"><b>Empresa:</b> ${o.agencies.length?o.agencies.join(', '):'No identificada'} · <b>Paraderos:</b> ${o.stops.length?o.stops.join(' → '):'No identificados'}</div><div>${o.legs.map(l=>`<span class="leg ${l.mode==='BUS'||l.mode==='TRANSIT'?'bus':''}"><b>${l.mode}</b>${l.route?' · '+l.route:''}${l.agency?' · '+l.agency:''}${l.from?' · '+l.from+' → '+l.to:''}</span>`).join('')}</div><div style="font-size:9px;color:#77849a;margin-top:5px">Caminata: ${mins(o.walk)} · Espera: ${mins(o.wait)}</div></div>`).join(''):'<div class="empty">No hay itinerarios en los responseBody de los logs consultados.</div>';
+}
+function renderMatrix(a){
+ const p={};a.forEach(x=>{if(x.oid&&x.did){const k=x.oid+'|'+x.did;p[k]=(p[k]||0)+1}});
+ const ids=[...new Set(Object.keys(p).flatMap(k=>k.split('|')))].slice(0,14),max=Math.max(1,...Object.values(p));
+ if(!ids.length){$('matrix').innerHTML='<div class="empty">Sin datos OD.</div>';return}
+ let h='<table><thead><tr><th>Origen</th>'+ids.map(i=>`<th>${name(i)}</th>`).join('')+'</tr></thead><tbody>';
+ ids.forEach(i=>{h+=`<tr><th>${name(i)}</th>`;ids.forEach(j=>{const n=p[i+'|'+j]||0,alpha=n?.1*(n/max):0;h+=`<td class="heat" style="${n?`background:rgba(38,132,255,${.12+.68*n/max})`:''};color:${n?'#173b6d':'#aab4c1'}">${fmt(n)}</td>`});h+='</tr>'});$('matrix').innerHTML=h+'</tbody></table><div class="last" style="margin-top:6px">Las celdas representan solicitudes de planificación, no viajes realizados.</div>';
+}
+function table(){
+ $('logrows').innerHTML=rows.slice(0,25).map((x,i)=>`<tr onclick="detail(rows[${i}])"><td>${x.date?x.date.toLocaleString('es-PE'):'—'}</td><td>${name(x.oid)}</td><td>${name(x.did)}</td><td>${x.alts}</td><td><span class="pill">${x.status}</span></td></tr>`).join('')||'<tr><td colspan="5">Sin registros.</td></tr>';
+}
+function detail(x){$('detail').innerHTML=`<table><tr><td>ID</td><td>${x.id}</td></tr><tr><td>Fecha/hora</td><td>${x.date?x.date.toLocaleString('es-PE'):'—'}</td></tr><tr><td>Origen</td><td>${name(x.oid)}</td></tr><tr><td>Destino</td><td>${name(x.did)}</td></tr><tr><td>Hora solicitada</td><td>${x.requestedTime}</td></tr><tr><td>Alternativas solicitadas</td><td>${x.alts}</td></tr><tr><td>HTTP</td><td>${x.method} · ${x.status}</td></tr><tr><td>Endpoint</td><td>${x.uri}</td></tr><tr><td>Host</td><td>${x.host}</td></tr><tr><td>Itinerarios en responseBody</td><td>${its(x).length}</td></tr></table>`}
+function fillFilters(){
+ const origins=[...new Set(rows.map(x=>x.oid).filter(Boolean))],dest=[...new Set(rows.map(x=>x.did).filter(Boolean))];
+ $('origin').innerHTML='<option value="">Todos</option>'+origins.map(x=>`<option value="${x}">${name(x)}</option>`).join('');
+ $('destination').innerHTML='<option value="">Todos</option>'+dest.map(x=>`<option value="${x}">${name(x)}</option>`).join('');
+}
+async function load(){
+ const f=$('from').value,t=$('to').value;$('period').textContent=f+' — '+t;$('refresh').disabled=true;$('status').textContent='Consultando Analytics API…';$('status').className='status';
+ try{
+  const F=encodeURIComponent(f+'T00:00:00Z'),T=encodeURIComponent(t+'T23:59:59Z');
+  const [st,lg]=await Promise.all([get(`${API}/Stats?from=${F}&to=${T}`),get(`${API}/Logs?headerContains=x-origin-district&from=${F}&to=${T}&limit=500&offset=0`)]);
+  rows=list(lg).map(extract);$('total').textContent=fmt(st.total_requests??st.totalRequests);$('devices').textContent=fmt(st.unique_devices??st.uniqueDevices);
+  fillFilters();const z=analyze(rows);$('routeCount').textContent=fmt(Object.keys(z.routes).length);$('agencyCount').textContent=fmt(Object.keys(z.agencies).length);
+  $('avgDuration').textContent=mins(avg(z.dur));$('avgWalk').textContent=mins(avg(z.walk));$('avgWait').textContent=mins(avg(z.wait));
+  const dep=Object.entries(z.dep).sort((a,b)=>b[1]-a[1])[0];$('topDeparture').textContent=dep?dep[0]+':00':'—';$('topDepartureCount').textContent=dep?fmt(dep[1])+' itinerarios':'';
+  rank('routesRank',z.routes);rank('agencyRank',z.agencies);rank('stopRank',z.stops);renderRelations(z);renderOptions(z);renderCharts(z);renderMatrix(rows);table();if(rows[0])detail(rows[0]);
+  $('status').textContent='Conectado · '+rows.length+' logs cargados';$('status').className='status ok';$('last').textContent='Actualizado '+new Date().toLocaleTimeString('es-PE');
+ }catch(e){$('status').textContent='No fue posible consultar la API: '+e.message;$('status').className='status err'}
+ finally{$('refresh').disabled=false}
+}
+const today=new Date().toISOString().slice(0,10);$('from').value=today;$('to').value=today;$('apply').onclick=load;$('refresh').onclick=load;load();setInterval(load,60000);
+</script>
+</body>
+</html>
